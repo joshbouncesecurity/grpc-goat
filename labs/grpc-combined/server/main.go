@@ -200,10 +200,23 @@ func (s *imagePreviewServer) FetchImage(ctx context.Context, req *pb.FetchImageR
 	return &pb.FetchImageResponse{Success: true, Content: string(body)}, nil
 }
 
+func writeFlagFile() {
+	path := "/flag.txt"
+	if runtime.GOOS == "windows" {
+		path = os.TempDir() + "\\flag.txt"
+	}
+	if err := os.WriteFile(path, []byte("GRPC_GOAT{command_injection_file_listing}\n"), 0644); err != nil {
+		log.Printf("Warning: could not write flag file %s: %v", path, err)
+	} else {
+		log.Printf("Lab 008 flag file: %s", path)
+	}
+}
+
 // --- Main ---
 
 func main() {
 	startFlagServer()
+	writeFlagFile()
 	time.Sleep(500 * time.Millisecond)
 
 	port := os.Getenv("PORT")
