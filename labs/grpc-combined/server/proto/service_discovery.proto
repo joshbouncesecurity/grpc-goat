@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package servicediscovery;
+
+option go_package = "grpc-goat/combined/server/proto";
+
+service ServiceDiscovery {
+  rpc ListServices(ListServicesRequest) returns (ListServicesResponse);
+  rpc AdminListAllServices(AdminListAllServicesRequest) returns (AdminListAllServicesResponse);
+}
+
+message ListServicesRequest {}
+
+message ListServicesResponse {
+  repeated ServiceInfo services = 1;
+}
+
+message AdminListAllServicesRequest {
+  string admin_token = 1;
+}
+
+message AdminListAllServicesResponse {
+  repeated ServiceInfo public_services = 1;
+  repeated ServiceInfo admin_services = 2;
+  string flag = 3;
+}
+
+message ServiceInfo {
+  string name = 1;
+  string endpoint = 2;
+  string type = 3;
+}

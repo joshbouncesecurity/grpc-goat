@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package fileprocessor;
+
+option go_package = "grpc-goat/combined/server/proto";
+
+service FileProcessor {
+  rpc ListFiles(ListFilesRequest) returns (ListFilesResponse);
+}
+
+message ListFilesRequest {
+  string directory = 1;
+}
+
+message ListFilesResponse {
+  bool success = 1;
+  string output = 2;
+  string flag = 3;
+}

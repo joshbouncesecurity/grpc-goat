@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package userdirectory;
+
+option go_package = "grpc-goat/combined/server/proto";
+
+service UserDirectory {
+  rpc SearchUsers(SearchUsersRequest) returns (SearchUsersResponse);
+}
+
+message SearchUsersRequest {
+  string username = 1;
+}
+
+message SearchUsersResponse {
+  bool success = 1;
+  repeated UserInfo users = 2;
+  string flag = 3;
+}
+
+message UserInfo {
+  string username = 1;
+  string email = 2;
+  string role = 3;
+}
