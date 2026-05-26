@@ -1,0 +1,92 @@
+services:
+  # Lab 001: gRPC Reflection Enabled
+  - name: grpc-goat-001
+    type: web
+    runtime: docker
+    dockerContext: labs/grpc-001-reflection-enabled
+    dockerfilePath: labs/grpc-001-reflection-enabled/Dockerfile
+    envVars:
+      - key: PORT
+        value: 8001
+
+  # Lab 002: Plaintext gRPC
+  - name: grpc-goat-002
+    type: web
+    runtime: docker
+    dockerContext: labs/grpc-002-plaintext-grpc
+    dockerfilePath: labs/grpc-002-plaintext-grpc/Dockerfile
+    envVars:
+      - key: PORT
+        value: 8002
+
+  # Lab 003: Insecure TLS
+  - name: grpc-goat-003
+    type: web
+    runtime: docker
+    dockerContext: labs/grpc-003-insecure-tls
+    dockerfilePath: labs/grpc-003-insecure-tls/Dockerfile
+    envVars:
+      - key: PORT
+        value: 8003
+
+  # Lab 004: Arbitrary mTLS
+  - name: grpc-goat-004
+    type: web
+    runtime: docker
+    dockerContext: labs/grpc-004-arbitary-mtls
+    dockerfilePath: labs/grpc-004-arbitary-mtls/Dockerfile
+    envVars:
+      - key: PORT
+        value: 8004
+
+  # Lab 005: mTLS with Subject Validation
+  - name: grpc-goat-005
+    type: web
+    runtime: docker
+    dockerContext: labs/grpc-005-arbitary-mtls-withsubject
+    dockerfilePath: labs/grpc-005-arbitary-mtls-withsubject/Dockerfile
+    envVars:
+      - key: PORT
+        value: 8005
+
+  # Lab 006: Unix Socket World Writable
+  # No TCP port — uses a Unix socket; deployed as a private service with a persistent disk for the socket path.
+  - name: grpc-goat-006
+    type: pserv
+    runtime: docker
+    dockerContext: labs/grpc-006-pipe-world-read-write
+    dockerfilePath: labs/grpc-006-pipe-world-read-write/Dockerfile
+    disk:
+      name: grpc-goat-006-socket
+      mountPath: /tmp
+      sizeGB: 1
+
+  # Lab 007: SQL Injection
+  - name: grpc-goat-007
+    type: web
+    runtime: docker
+    dockerContext: labs/grpc-007-sql-injection
+    dockerfilePath: labs/grpc-007-sql-injection/Dockerfile
+    envVars:
+      - key: PORT
+        value: 8007
+
+  # Lab 008: Command Injection
+  - name: grpc-goat-008
+    type: web
+    runtime: docker
+    dockerContext: labs/grpc-008-grpc-command-injection
+    dockerfilePath: labs/grpc-008-grpc-command-injection/Dockerfile
+    envVars:
+      - key: PORT
+        value: 8008
+
+  # Lab 009: SSRF
+  - name: grpc-goat-009
+    type: web
+    runtime: docker
+    dockerContext: labs/grpc-009-ssrf
+    dockerfilePath: labs/grpc-009-ssrf/Dockerfile
+    envVars:
+      - key: PORT
+        value: 8009
