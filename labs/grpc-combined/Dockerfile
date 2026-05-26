@@ -21,6 +21,10 @@ RUN go build -o grpc-goat main.go
 
 FROM alpine:latest
 RUN apk --no-cache add ca-certificates
+
+# Lab 008 flag file (readable via command injection)
+RUN echo "GRPC_GOAT{command_injection_file_listing}" > /flag.txt
+
 WORKDIR /root/
 COPY --from=builder /app/grpc-goat .
 
