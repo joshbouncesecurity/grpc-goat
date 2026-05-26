@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"os"
 	"strings"
 
 	"google.golang.org/grpc"
@@ -125,7 +126,11 @@ func (s *userDirectoryServer) SearchUsers(ctx context.Context, req *pb.SearchUse
 }
 
 func main() {
-	lis, err := net.Listen("tcp", ":8007")
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8007"
+	}
+	lis, err := net.Listen("tcp", ":"+port)
 	if err != nil {
 		log.Fatalf("Failed to listen: %v", err)
 	}

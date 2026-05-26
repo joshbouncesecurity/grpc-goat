@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"os"
 	"os/exec"
 	"strings"
 
@@ -62,7 +63,11 @@ func (s *fileProcessorServer) ListFiles(ctx context.Context, req *pb.ListFilesRe
 }
 
 func main() {
-	lis, err := net.Listen("tcp", ":8008")
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8008"
+	}
+	lis, err := net.Listen("tcp", ":"+port)
 	if err != nil {
 		log.Fatalf("Failed to listen: %v", err)
 	}

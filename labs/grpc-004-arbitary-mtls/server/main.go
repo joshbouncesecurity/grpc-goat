@@ -11,6 +11,7 @@ import (
 	"log"
 	"math/big"
 	"net"
+	"os"
 	"time"
 
 	"google.golang.org/grpc"
@@ -123,7 +124,11 @@ func generateSelfSignedCert() (tls.Certificate, error) {
 }
 
 func main() {
-	lis, err := net.Listen("tcp", ":8004")
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8004"
+	}
+	lis, err := net.Listen("tcp", ":"+port)
 	if err != nil {
 		log.Fatalf("Failed to listen: %v", err)
 	}

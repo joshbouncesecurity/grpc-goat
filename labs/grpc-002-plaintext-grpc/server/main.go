@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"net"
+	"os"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/peer"
@@ -57,8 +58,11 @@ func (s *authServer) Login(ctx context.Context, req *pb.LoginRequest) (*pb.Login
 }
 
 func main() {
-	// Listen on port 8002
-	lis, err := net.Listen("tcp", ":8002")
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8002"
+	}
+	lis, err := net.Listen("tcp", ":"+port)
 	if err != nil {
 		log.Fatalf("Failed to listen: %v", err)
 	}
