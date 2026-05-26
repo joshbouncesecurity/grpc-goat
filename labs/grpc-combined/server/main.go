@@ -14,8 +14,10 @@ import (
 	"time"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/peer"
 	"google.golang.org/grpc/reflection"
+	"google.golang.org/grpc/status"
 	_ "modernc.org/sqlite"
 
 	pb "grpc-goat/combined/server/proto"
@@ -38,22 +40,25 @@ type serviceDiscoveryServer struct {
 func (s *serviceDiscoveryServer) ListServices(ctx context.Context, req *pb.ListServicesRequest) (*pb.ListServicesResponse, error) {
 	return &pb.ListServicesResponse{
 		Services: []*pb.ServiceInfo{
-			{Name: "user-api", Endpoint: "user-api:8080", Type: "public"},
-			{Name: "payment-service", Endpoint: "payment:8081", Type: "public"},
+			{Name: "[lab007] UserDirectory", Endpoint: "user-directory:8080", Type: "public"},
+			{Name: "[lab008] FileProcessor", Endpoint: "file-processor:8081", Type: "public"},
 		},
 	}, nil
 }
 
 func (s *serviceDiscoveryServer) AdminListAllServices(ctx context.Context, req *pb.AdminListAllServicesRequest) (*pb.AdminListAllServicesResponse, error) {
+	if req.AdminToken == "" {
+		return nil, status.Error(codes.Unauthenticated, "admin_token required")
+	}
+
 	return &pb.AdminListAllServicesResponse{
 		PublicServices: []*pb.ServiceInfo{
-			{Name: "user-api", Endpoint: "user-api:8080", Type: "public"},
-			{Name: "payment-service", Endpoint: "payment:8081", Type: "public"},
+			{Name: "[lab007] UserDirectory", Endpoint: "user-directory:8080", Type: "public"},
+			{Name: "[lab008] FileProcessor", Endpoint: "file-processor:8081", Type: "public"},
 		},
 		AdminServices: []*pb.ServiceInfo{
-			{Name: "admin-panel", Endpoint: "admin:9090", Type: "admin"},
-			{Name: "database-admin", Endpoint: "db-admin:9091", Type: "admin"},
-			{Name: "user-management", Endpoint: "user-mgmt:9092", Type: "admin"},
+			{Name: "[lab001] ServiceDiscovery", Endpoint: "service-discovery:8082", Type: "admin"},
+			{Name: "[lab009] ImagePreview", Endpoint: "image-preview:8083", Type: "admin"},
 		},
 		Flag: "GRPC_GOAT{reflection_exposes_hidden_admin_methods}",
 	}, nil
@@ -84,7 +89,7 @@ func newUserDirectoryServer() *userDirectoryServer {
 }
 
 func (s *userDirectoryServer) initDatabase() {
-	_, err := s.db.Exec(`CREATE TABLE users (username TEXT PRIMARY KEY, email TEXT NOT NULL, role TEXT NOT NULL)`)
+	_, err := s.db.Exec(`CREATE TABLE IF NOT EXISTS users (username TEXT PRIMARY KEY, email TEXT NOT NULL, role TEXT NOT NULL)`)
 	if err != nil {
 		log.Fatalf("Failed to create table: %v", err)
 	}

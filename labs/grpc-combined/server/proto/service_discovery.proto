@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package servicediscovery;
+package lab001servicediscovery;
 
 option go_package = "grpc-goat/combined/server/proto";
 

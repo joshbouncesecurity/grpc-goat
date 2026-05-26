@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package fileprocessor;
+package lab008fileprocessor;
 
 option go_package = "grpc-goat/combined/server/proto";
 

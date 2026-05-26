@@ -1,2 +1,4 @@
 *.ps1
 .claude/
+labs/grpc-combined/server/proto/*.pb.go
+labs/grpc-combined/server/grpc-goat.exe

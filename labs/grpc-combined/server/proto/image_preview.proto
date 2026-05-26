@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package imagepreview;
+package lab009imagepreview;
 
 option go_package = "grpc-goat/combined/server/proto";
 
