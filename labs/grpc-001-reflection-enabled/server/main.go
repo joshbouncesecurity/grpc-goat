@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"net"
+	"os"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/peer"
@@ -64,7 +65,11 @@ func (s *serviceDiscoveryServer) AdminListAllServices(ctx context.Context, req *
 }
 
 func main() {
-	lis, err := net.Listen("tcp", ":8001")
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8001"
+	}
+	lis, err := net.Listen("tcp", ":"+port)
 	if err != nil {
 		log.Fatalf("Failed to listen: %v", err)
 	}
@@ -75,7 +80,7 @@ func main() {
 
 	reflection.Register(s)
 
-	log.Println("gRPC server starting on port 8001...")
+	log.Printf("gRPC server starting on port %s...", port)
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("Failed to serve: %v", err)
 	}
