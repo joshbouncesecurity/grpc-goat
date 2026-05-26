@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"runtime"
 	"strings"
 	"time"
 
@@ -139,10 +140,17 @@ type fileProcessorServer struct {
 
 func (s *fileProcessorServer) ListFiles(ctx context.Context, req *pb.ListFilesRequest) (*pb.ListFilesResponse, error) {
 	// VULNERABILITY: command injection
-	command := fmt.Sprintf("ls -la %s", req.Directory)
+	var shell, flag1, command string
+	if runtime.GOOS == "windows" {
+		shell, flag1 = "cmd", "/C"
+		command = fmt.Sprintf("dir %s", req.Directory)
+	} else {
+		shell, flag1 = "sh", "-c"
+		command = fmt.Sprintf("ls -la %s", req.Directory)
+	}
 	log.Printf("Executing command: %s", command)
 
-	output, err := exec.Command("sh", "-c", command).Output()
+	output, err := exec.Command(shell, flag1, command).Output()
 	if err != nil {
 		return &pb.ListFilesResponse{Success: false, Output: fmt.Sprintf("Command execution failed: %v", err)}, nil
 	}
